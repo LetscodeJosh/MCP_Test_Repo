@@ -53,7 +53,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                     Back
                 </button>
-                <h2 id="header-title">MCP Profiling</h2>
+                <h2 id="header-title">PIMS MCP</h2>
                 <button class="header-action" id="header-save" style="visibility: hidden;">
                     Save
                 </button>
@@ -68,7 +68,7 @@
                                 <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z" />
                             </svg>
                         </div>
-                        <h1>ERPNext v15</h1>
+                        <h1>PIMS MCP</h1>
                         <p>Successful COREnergy Engagement</p>
                     </div>
 
@@ -84,7 +84,13 @@
                             <label>Password</label>
                             <div class="input-wrapper">
                                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                <input type="password" id="login-password" class="input-control" value="UEPCS101c!" required>
+                                <input type="password" id="login-password" class="input-control" value="UEPCS101c!" style="padding-right: 45px;" required>
+                                <button type="button" id="toggle-password-btn" style="position: absolute; right: 14px; background: none; border: none; color: var(--text-muted); cursor: pointer; outline: none; display: flex; align-items: center;">
+                                    <svg id="eye-icon" style="position: static; width: 20px; height: 20px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                         <button type="submit" class="btn" id="login-btn">

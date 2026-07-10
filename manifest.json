@@ -1,6 +1,6 @@
 {
-  "name": "MCP COREnergy Profiling",
-  "short_name": "MCP Profiling",
+  "name": "PIMS MCP",
+  "short_name": "PIMS MCP",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#121214",

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/engagement.dart';
+import '../models/lookup_models.dart';
 import '../services/api_service.dart';
 
 class DetailScreen extends StatefulWidget {

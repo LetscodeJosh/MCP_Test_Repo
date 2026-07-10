@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/api_service.dart';
-import 'list_screen.dart';
+import 'doctor_masterlist_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -39,7 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (success) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const ListScreen()),
+          MaterialPageRoute(builder: (_) => const DoctorMasterlistScreen()),
         );
       } else {
         setState(() {

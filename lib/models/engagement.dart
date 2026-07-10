@@ -87,26 +87,4 @@ class Engagement {
   }
 }
 
-class Institution {
-  final String name; // ID, e.g., INST-00001
-  final String institutionName; // Descriptive name, e.g., Manila Doctors Hospital
 
-  Institution({
-    required this.name,
-    required this.institutionName,
-  });
-
-  factory Institution.fromJson(Map<String, dynamic> json) {
-    return Institution(
-      name: json['name'] ?? '',
-      institutionName: json['institution_name'] ?? '',
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'institution_name': institutionName,
-    };
-  }
-}

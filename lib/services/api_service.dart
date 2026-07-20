@@ -777,6 +777,7 @@ class ApiService extends ChangeNotifier {
 
   Future<COREnergyEngage> _saveCOREnergyEngageOffline(COREnergyEngage engage, {required bool isCreate}) async {
     final name = engage.name.isEmpty ? (engage.institutionName ?? 'OFFLINE-${DateTime.now().millisecondsSinceEpoch}') : engage.name;
+    final nowStr = DateTime.now().toIso8601String().replaceFirst('T', ' ').substring(0, 19);
     final localEngage = COREnergyEngage(
       name: name,
       institutionName: engage.institutionName ?? name,
@@ -786,6 +787,8 @@ class ApiService extends ChangeNotifier {
       cityMunicipality: engage.cityMunicipality,
       streetAddress: engage.streetAddress,
       salesRep: engage.salesRep,
+      creation: engage.creation ?? nowStr,
+      modified: nowStr,
       contacts: engage.contacts,
       visits: engage.visits,
       actionItems: engage.actionItems,

@@ -1120,112 +1120,116 @@ class _ListScreenState extends State<ListScreen> {
                   : Column(
                       children: [
                         Expanded(
-                          child: ListView.builder(
-                            padding: const EdgeInsets.all(12),
-                            itemCount: _paginatedEngagements.length,
-                            itemBuilder: (context, index) {
-                              final item = _paginatedEngagements[index];
-                              final companyName = _getCompanyLabel(item.company);
-                              final isUnsuccessful = item.unsuccessfulCall;
+                          child: RefreshIndicator(
+                            onRefresh: _loadData,
+                            child: ListView.builder(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.all(12),
+                              itemCount: _paginatedEngagements.length,
+                              itemBuilder: (context, index) {
+                                final item = _paginatedEngagements[index];
+                                final companyName = _getCompanyLabel(item.company);
+                                final isUnsuccessful = item.unsuccessfulCall;
 
-                              return Card(
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  side: const BorderSide(color: Color(0xFFE5E5EA)),
-                                ),
-                                elevation: 0,
-                                margin: const EdgeInsets.only(bottom: 12),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(16),
-                                  onTap: () async {
-                                    final result = await Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (_) => DetailScreen(
-                                            engagement: item,
-                                            institutions: _allInstitutions,
-                                            salesReps: _salesReps,
+                                return Card(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    side: const BorderSide(color: Color(0xFFE5E5EA)),
+                                  ),
+                                  elevation: 0,
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(16),
+                                    onTap: () async {
+                                      final result = await Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (_) => DetailScreen(
+                                              engagement: item,
+                                              institutions: _allInstitutions,
+                                              salesReps: _salesReps,
+                                            ),
                                           ),
-                                        ),
-                                    );
-                                    if (result == true) {
-                                      _loadData();
-                                    }
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                item.name ?? 'NEW',
-                                                style: const TextStyle(
-                                                  color: Color(0xFF1C1C1E),
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                              decoration: BoxDecoration(
-                                                color: isUnsuccessful
-                                                    ? const Color(0xFFFF453A).withOpacity(0.15)
-                                                    : const Color(0xFF30D158).withOpacity(0.15),
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                              child: Text(
-                                                isUnsuccessful ? 'Unsuccessful' : 'Successful',
-                                                style: TextStyle(
-                                                  color: isUnsuccessful 
-                                                      ? const Color(0xFFFF453A) 
-                                                      : const Color(0xFF30D158),
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.bold,
+                                      );
+                                      if (result == true) {
+                                        _loadData();
+                                      }
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  item.name ?? 'NEW',
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF1C1C1E),
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  overflow: TextOverflow.ellipsis,
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 14),
-                                        Row(
-                                          children: [
-                                            const Icon(Icons.business, color: Color(0xFF8E8E93), size: 16),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: Text(
-                                                companyName,
-                                                style: const TextStyle(color: Color(0xFF636366), fontSize: 13),
-                                                overflow: TextOverflow.ellipsis,
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: isUnsuccessful
+                                                      ? const Color(0xFFFF453A).withOpacity(0.15)
+                                                      : const Color(0xFF30D158).withOpacity(0.15),
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: Text(
+                                                  isUnsuccessful ? 'Unsuccessful' : 'Successful',
+                                                  style: TextStyle(
+                                                    color: isUnsuccessful 
+                                                        ? const Color(0xFFFF453A) 
+                                                        : const Color(0xFF30D158),
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Row(
-                                          children: [
-                                            const Icon(Icons.person, color: Color(0xFF8E8E93), size: 16),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: Text(
-                                                item.salesRep ?? 'No Sales Rep',
-                                                style: const TextStyle(color: Color(0xFF636366), fontSize: 13),
-                                                overflow: TextOverflow.ellipsis,
+                                            ],
+                                          ),
+                                          const SizedBox(height: 14),
+                                          Row(
+                                            children: [
+                                              const Icon(Icons.business, color: Color(0xFF8E8E93), size: 16),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  companyName,
+                                                  style: const TextStyle(color: Color(0xFF636366), fontSize: 13),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                            ],
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Row(
+                                            children: [
+                                              const Icon(Icons.person, color: Color(0xFF8E8E93), size: 16),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  item.salesRep ?? 'No Sales Rep',
+                                                  style: const TextStyle(color: Color(0xFF636366), fontSize: 13),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
                         ),
                         _buildPaginationControls(_totalEngagements),
@@ -1238,145 +1242,149 @@ class _ListScreenState extends State<ListScreen> {
                   : Column(
                       children: [
                         Expanded(
-                          child: ListView.builder(
-                            padding: const EdgeInsets.all(12),
-                            itemCount: _paginatedEngageLogs.length,
-                            itemBuilder: (context, index) {
-                              final item = _paginatedEngageLogs[index];
+                          child: RefreshIndicator(
+                            onRefresh: _loadData,
+                            child: ListView.builder(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.all(12),
+                              itemCount: _paginatedEngageLogs.length,
+                              itemBuilder: (context, index) {
+                                final item = _paginatedEngageLogs[index];
 
-                              return Card(
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  side: const BorderSide(color: Color(0xFFE5E5EA)),
-                                ),
-                                elevation: 0,
-                                margin: const EdgeInsets.only(bottom: 12),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(16),
-                                  onTap: () async {
-                                    final result = await Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (_) => COREnergyEngageDetailScreen(
-                                          engage: item,
-                                          institutions: _allInstitutions,
-                                          salesReps: _salesReps,
-                                          psgcLocations: _allPsgcLocations,
-                                        ),
-                                      ),
-                                    );
-                                    if (result == true) {
-                                      _loadData();
-                                    }
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        // Resolved Institution Name
-                                        Text(
-                                          (() {
-                                            final match = _allInstitutions.firstWhere(
-                                              (i) => i.name == item.institutionName || i.name == item.name,
-                                              orElse: () => Institution(
-                                                name: item.name,
-                                                institutionName: item.hospitalClinic ?? item.institutionName ?? 'Unknown Institution',
-                                              ),
-                                            );
-                                            return match.institutionName;
-                                          })(),
-                                          style: const TextStyle(
-                                            color: Color(0xFF1C1C1E),
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
+                                return Card(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    side: const BorderSide(color: Color(0xFFE5E5EA)),
+                                  ),
+                                  elevation: 0,
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(16),
+                                    onTap: () async {
+                                      final result = await Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => COREnergyEngageDetailScreen(
+                                            engage: item,
+                                            institutions: _allInstitutions,
+                                            salesReps: _salesReps,
+                                            psgcLocations: _allPsgcLocations,
                                           ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        const SizedBox(height: 12),
-                                        const Divider(height: 1, color: Color(0xFFE5E5EA)),
-                                        const SizedBox(height: 12),
-                                        
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                      );
+                                      if (result == true) {
+                                        _loadData();
+                                      }
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          // Resolved Institution Name
+                                          Text(
+                                            (() {
+                                              final match = _allInstitutions.firstWhere(
+                                                (i) => i.name == item.institutionName || i.name == item.name,
+                                                orElse: () => Institution(
+                                                  name: item.name,
+                                                  institutionName: item.hospitalClinic ?? item.institutionName ?? 'Unknown Institution',
+                                                ),
+                                              );
+                                              return match.institutionName;
+                                            })(),
+                                            style: const TextStyle(
+                                              color: Color(0xFF1C1C1E),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 12),
+                                          const Divider(height: 1, color: Color(0xFFE5E5EA)),
+                                          const SizedBox(height: 12),
+                                          
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    const Text('REGION', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 10, fontWeight: FontWeight.bold)),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      (item.region == null || item.region!.trim().isEmpty) ? '-' : _resolveLocationLabelOnly(item.region),
+                                                      style: const TextStyle(color: Color(0xFF1C1C1E), fontSize: 12),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    const Text('PROVINCE', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 10, fontWeight: FontWeight.bold)),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      (item.province == null || item.province!.trim().isEmpty) ? '-' : _resolveLocationLabelOnly(item.province),
+                                                      style: const TextStyle(color: Color(0xFF1C1C1E), fontSize: 12),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    const Text('CITY/MUNICIPALITY', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 10, fontWeight: FontWeight.bold)),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      (item.cityMunicipality == null || item.cityMunicipality!.trim().isEmpty) ? '-' : _resolveLocationLabelOnly(item.cityMunicipality),
+                                                      style: const TextStyle(color: Color(0xFF1C1C1E), fontSize: 12),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.end,
                                                 children: [
-                                                  const Text('REGION', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 10, fontWeight: FontWeight.bold)),
+                                                  const Text('ID', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 10, fontWeight: FontWeight.bold)),
                                                   const SizedBox(height: 4),
-                                                  Text(
-                                                    (item.region == null || item.region!.trim().isEmpty) ? '-' : _resolveLocationLabelOnly(item.region),
-                                                    style: const TextStyle(color: Color(0xFF1C1C1E), fontSize: 12),
-                                                    maxLines: 1,
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
+                                                  Text(item.name, style: const TextStyle(color: Color(0xFF0056B3), fontSize: 12, fontWeight: FontWeight.bold)),
                                                 ],
                                               ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  const Text('PROVINCE', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 10, fontWeight: FontWeight.bold)),
-                                                  const SizedBox(height: 4),
-                                                  Text(
-                                                    (item.province == null || item.province!.trim().isEmpty) ? '-' : _resolveLocationLabelOnly(item.province),
-                                                    style: const TextStyle(color: Color(0xFF1C1C1E), fontSize: 12),
-                                                    maxLines: 1,
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
-                                                ],
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            children: [
+                                              const Icon(Icons.person, color: Color(0xFF8E8E93), size: 14),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                'Sales Rep: ${item.salesRep ?? "No Sales Rep"}',
+                                                style: const TextStyle(color: Color(0xFF636366), fontSize: 12),
                                               ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  const Text('CITY/MUNICIPALITY', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 10, fontWeight: FontWeight.bold)),
-                                                  const SizedBox(height: 4),
-                                                  Text(
-                                                    (item.cityMunicipality == null || item.cityMunicipality!.trim().isEmpty) ? '-' : _resolveLocationLabelOnly(item.cityMunicipality),
-                                                    style: const TextStyle(color: Color(0xFF1C1C1E), fontSize: 12),
-                                                    maxLines: 1,
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.end,
-                                              children: [
-                                                const Text('ID', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 10, fontWeight: FontWeight.bold)),
-                                                const SizedBox(height: 4),
-                                                Text(item.name, style: const TextStyle(color: Color(0xFF0056B3), fontSize: 12, fontWeight: FontWeight.bold)),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Row(
-                                          children: [
-                                            const Icon(Icons.person, color: Color(0xFF8E8E93), size: 14),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              'Sales Rep: ${item.salesRep ?? "No Sales Rep"}',
-                                              style: const TextStyle(color: Color(0xFF636366), fontSize: 12),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
                         ),
                         _buildPaginationControls(_totalEngageLogs),

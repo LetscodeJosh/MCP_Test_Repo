@@ -27,7 +27,7 @@ android {
     productFlavors {
         create("hcp") {
             dimension = "app"
-            applicationId = "com.pims.mcp_profiling"
+            applicationId = "com.pims.hcp_profiling"
             manifestPlaceholders["appName"] = "PIMS HCP"
         }
         create("corenergy") {

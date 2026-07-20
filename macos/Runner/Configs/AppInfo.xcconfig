@@ -8,7 +8,7 @@
 PRODUCT_NAME = mcp_profiling
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.pims.hcp_profiling
+PRODUCT_BUNDLE_IDENTIFIER = com.pims.mcpProfiling
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 com.pims. All rights reserved.

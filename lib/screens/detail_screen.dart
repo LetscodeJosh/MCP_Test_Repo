@@ -30,6 +30,7 @@ class _DetailScreenState extends State<DetailScreen> {
   bool _unsuccessfulCall = false;
   String? _reasonForUnsuccessfulCall;
   String? _selectedCompany;
+  Institution? _selectedInstitutionObject;
   String? _selectedSalesRep;
   
   final _contactFirstNameController = TextEditingController();
@@ -71,6 +72,12 @@ class _DetailScreenState extends State<DetailScreen> {
       _unsuccessfulCall = item.unsuccessfulCall;
       _reasonForUnsuccessfulCall = item.reasonForUnsuccessfulCall;
       _selectedCompany = item.company;
+      if (item.company != null) {
+        _selectedInstitutionObject = widget.institutions.firstWhere(
+          (i) => i.name == item.company,
+          orElse: () => Institution(name: item.company!, institutionName: item.company!),
+        );
+      }
       _selectedSalesRep = item.salesRep;
       _contactFirstNameController.text = item.contact ?? '';
       _contactLastNameController.text = item.lastName ?? '';
@@ -381,6 +388,9 @@ class _DetailScreenState extends State<DetailScreen> {
                         _selectedCompany == null
                             ? 'Tap to select Company...'
                             : (() {
+                                if (_selectedInstitutionObject != null && _selectedInstitutionObject!.name == _selectedCompany) {
+                                  return '${_selectedInstitutionObject!.name} - ${_selectedInstitutionObject!.institutionName}';
+                                }
                                 final match = widget.institutions.firstWhere(
                                   (i) => i.name == _selectedCompany,
                                   orElse: () => Institution(name: _selectedCompany!, institutionName: _selectedCompany!),
@@ -741,6 +751,7 @@ class _DetailScreenState extends State<DetailScreen> {
           onSelected: (inst) {
             setState(() {
               _selectedCompany = inst.name;
+              _selectedInstitutionObject = inst;
             });
           },
         );
@@ -818,7 +829,7 @@ class _SearchableInstitutionPickerState extends State<SearchableInstitutionPicke
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
+      height: MediaQuery.of(context).size.height * 0.85,
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
@@ -848,7 +859,23 @@ class _SearchableInstitutionPickerState extends State<SearchableInstitutionPicke
           const SizedBox(height: 12),
           Expanded(
             child: _filteredList.isEmpty
-                ? const Center(child: Text('No matching institutions found.', style: TextStyle(color: Color(0xFF8E8E93))))
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.business, size: 48, color: Color(0xFFC7C7CC)),
+                          const SizedBox(height: 8),
+                          Text(
+                            'No matching institutions found for "$_searchQuery".',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
                 : ListView.builder(
                     itemCount: _filteredList.length,
                     itemBuilder: (context, idx) {
@@ -864,10 +891,311 @@ class _SearchableInstitutionPickerState extends State<SearchableInstitutionPicke
                     },
                   ),
           ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.white,
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+                  builder: (ctx) {
+                    return QuickEntryInstitutionSheet(
+                      initialName: _searchQuery,
+                      onSaved: (newInst) {
+                        widget.onSelected(newInst);
+                        Navigator.pop(context); // Close SearchableInstitutionPicker
+                      },
+                    );
+                  },
+                );
+              },
+              icon: const Icon(Icons.add, color: Color(0xFF007AFF)),
+              label: const Text(
+                'Create a New Institution',
+                style: TextStyle(color: Color(0xFF007AFF), fontWeight: FontWeight.bold),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFF007AFF)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
+}
+
+class QuickEntryInstitutionSheet extends StatefulWidget {
+  final String initialName;
+  final Function(Institution) onSaved;
+
+  const QuickEntryInstitutionSheet({
+    Key? key,
+    required this.initialName,
+    required this.onSaved,
+  }) : super(key: key);
+
+  @override
+  State<QuickEntryInstitutionSheet> createState() => _QuickEntryInstitutionSheetState();
+}
+
+class _QuickEntryInstitutionSheetState extends State<QuickEntryInstitutionSheet> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _streetController = TextEditingController();
+  
+  bool _isLoadingLocs = false;
+  bool _isSaving = false;
+  List<PsgcLocation> _psgcLocations = [];
+  
+  List<GeographicUnit> _regions = [];
+  List<GeographicUnit> _provinces = [];
+  List<GeographicUnit> _cities = [];
+
+  GeographicUnit? _selectedRegion;
+  GeographicUnit? _selectedProvince;
+  GeographicUnit? _selectedCity;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.text = widget.initialName;
+    _loadLocations();
+  }
+
+  Future<void> _loadLocations() async {
+    setState(() {
+      _isLoadingLocs = true;
+    });
+    try {
+      final apiService = Provider.of<ApiService>(context, listen: false);
+      final locs = await apiService.fetchPsgcLocations();
+      setState(() {
+        _psgcLocations = locs;
+        _regions = locs
+            .where((l) => l.locationType == 'Region')
+            .map((l) => GeographicUnit(l.locationLabel, l.name))
+            .toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
+        _isLoadingLocs = false;
+      });
+    } catch (e) {
+      print('Error loading PSGC locations: $e');
+      setState(() {
+        _isLoadingLocs = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _streetController.dispose();
+    super.dispose();
+  }
+
+  void _onRegionChanged(GeographicUnit? reg) {
+    setState(() {
+      _selectedRegion = reg;
+      _selectedProvince = null;
+      _selectedCity = null;
+      _provinces = [];
+      _cities = [];
+      
+      if (reg != null && _psgcLocations.isNotEmpty) {
+        _provinces = _psgcLocations
+            .where((l) => l.locationType == 'Province' && l.parentPsgcLocation == reg.code)
+            .map((l) => GeographicUnit(l.locationLabel, l.name))
+            .toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
+      }
+    });
+  }
+
+  void _onProvinceChanged(GeographicUnit? prov) {
+    setState(() {
+      _selectedProvince = prov;
+      _selectedCity = null;
+      _cities = [];
+      
+      if (prov != null && _psgcLocations.isNotEmpty) {
+        _cities = _psgcLocations
+            .where((l) => l.locationType == 'City' && l.parentPsgcLocation == prov.code)
+            .map((l) => GeographicUnit(l.locationLabel, l.name))
+            .toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
+      }
+    });
+  }
+
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+    
+    setState(() {
+      _isSaving = true;
+    });
+
+    final inst = Institution(
+      name: '',
+      institutionName: _nameController.text.trim(),
+      regionName: _selectedRegion?.code,
+      provinceName: _selectedProvince?.code,
+      cityMunicipality: _selectedCity?.code,
+      streetAddress: _streetController.text.trim().isEmpty ? null : _streetController.text.trim(),
+    );
+
+    try {
+      final apiService = Provider.of<ApiService>(context, listen: false);
+      final created = await apiService.createInstitution(inst);
+      setState(() {
+        _isSaving = false;
+      });
+      widget.onSaved(created);
+      Navigator.pop(context); // Close Quick Entry Sheet
+    } catch (e) {
+      setState(() {
+        _isSaving = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save institution: $e'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(
+        top: 16,
+        left: 20,
+        right: 20,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(color: const Color(0xFFE5E5EA), borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Quick Entry: Create Institution',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E)),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _nameController,
+                style: const TextStyle(color: Color(0xFF1C1C1E)),
+                decoration: InputDecoration(
+                  labelText: 'Institution Name *',
+                  labelStyle: const TextStyle(color: Color(0xFF8E8E93)),
+                  filled: true,
+                  fillColor: const Color(0xFFF4F6F9),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                ),
+                validator: (val) => (val == null || val.trim().isEmpty) ? 'Institution name is required' : null,
+              ),
+              const SizedBox(height: 12),
+              _isLoadingLocs
+                  ? const Center(child: Padding(padding: EdgeInsets.all(8.0), child: CircularProgressIndicator()))
+                  : Column(
+                      children: [
+                        DropdownButtonFormField<GeographicUnit>(
+                          value: _selectedRegion,
+                          style: const TextStyle(color: Color(0xFF1C1C1E)),
+                          decoration: InputDecoration(
+                            labelText: 'Region',
+                            labelStyle: const TextStyle(color: Color(0xFF8E8E93)),
+                            filled: true,
+                            fillColor: const Color(0xFFF4F6F9),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          ),
+                          items: _regions.map((r) => DropdownMenuItem(value: r, child: Text(r.name, style: const TextStyle(color: Color(0xFF1C1C1E))))).toList(),
+                          onChanged: _onRegionChanged,
+                        ),
+                        const SizedBox(height: 12),
+                        DropdownButtonFormField<GeographicUnit>(
+                          value: _selectedProvince,
+                          style: const TextStyle(color: Color(0xFF1C1C1E)),
+                          decoration: InputDecoration(
+                            labelText: 'Province',
+                            labelStyle: const TextStyle(color: Color(0xFF8E8E93)),
+                            filled: true,
+                            fillColor: const Color(0xFFF4F6F9),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          ),
+                          items: _provinces.map((p) => DropdownMenuItem(value: p, child: Text(p.name, style: const TextStyle(color: Color(0xFF1C1C1E))))).toList(),
+                          onChanged: _onProvinceChanged,
+                        ),
+                        const SizedBox(height: 12),
+                        DropdownButtonFormField<GeographicUnit>(
+                          value: _selectedCity,
+                          style: const TextStyle(color: Color(0xFF1C1C1E)),
+                          decoration: InputDecoration(
+                            labelText: 'City/Municipality',
+                            labelStyle: const TextStyle(color: Color(0xFF8E8E93)),
+                            filled: true,
+                            fillColor: const Color(0xFFF4F6F9),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          ),
+                          items: _cities.map((c) => DropdownMenuItem(value: c, child: Text(c.name, style: const TextStyle(color: Color(0xFF1C1C1E))))).toList(),
+                          onChanged: (val) => setState(() => _selectedCity = val),
+                        ),
+                      ],
+                    ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _streetController,
+                style: const TextStyle(color: Color(0xFF1C1C1E)),
+                decoration: InputDecoration(
+                  labelText: 'Street Address',
+                  labelStyle: const TextStyle(color: Color(0xFF8E8E93)),
+                  filled: true,
+                  fillColor: const Color(0xFFF4F6F9),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isSaving ? null : _save,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF007AFF),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: _isSaving
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Save Institution', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class GeographicUnit {
+  final String name;
+  final String code;
+  GeographicUnit(this.name, this.code);
 }
 
 class _ErpnextDateTimePickerDialog extends StatefulWidget {

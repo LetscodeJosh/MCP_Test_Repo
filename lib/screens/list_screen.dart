@@ -597,7 +597,7 @@ class _ListScreenState extends State<ListScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            Text(_currentTabIndex == 0 ? 'COREnergy Engage' : 'Coverage Map'),
+            Text(_currentTabIndex == 0 ? 'COREnergy Engage Copy' : 'Coverage Map'),
             if (apiService.isOffline) ...[
               const SizedBox(width: 8),
               Container(
@@ -775,7 +775,7 @@ class _ListScreenState extends State<ListScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        'COREnergy Engage',
+                        'COREnergy Engage Copy',
                         style: TextStyle(
                           color: _corenergySubTab == 1 ? Colors.white : const Color(0xFF8E8E93),
                           fontWeight: FontWeight.bold,
@@ -1351,7 +1351,7 @@ class _ListScreenState extends State<ListScreen> {
                     ))
               : (_filteredEngageLogs.isEmpty
                   ? const Center(
-                      child: Text('No COREnergy Engage logs found.', style: TextStyle(color: Color(0xFF8E8E93))),
+                      child: Text('No COREnergy Engage Copy logs found.', style: TextStyle(color: Color(0xFF8E8E93))),
                     )
                   : Column(
                       children: [

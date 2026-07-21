@@ -343,8 +343,8 @@ class _COREnergyEngageDetailScreenState extends State<COREnergyEngageDetailScree
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(widget.engage != null 
-                ? 'COREnergy Engage updated successfully' 
-                : 'COREnergy Engage submitted successfully'),
+                ? 'COREnergy Engage Copy updated successfully' 
+                : 'COREnergy Engage Copy submitted successfully'),
             backgroundColor: const Color(0xFF30D158),
           ),
         );
@@ -427,7 +427,7 @@ class _COREnergyEngageDetailScreenState extends State<COREnergyEngageDetailScree
       child: Scaffold(
         backgroundColor: const Color(0xFFF2F2F7),
         appBar: AppBar(
-          title: Text(widget.engage != null ? 'Edit COREnergy Engage' : 'New COREnergy Engage'),
+          title: Text(widget.engage != null ? 'Edit COREnergy Engage Copy' : 'New COREnergy Engage Copy'),
           backgroundColor: const Color(0xFF0056B3),
           foregroundColor: Colors.white,
           elevation: 0,
@@ -520,7 +520,7 @@ class _COREnergyEngageDetailScreenState extends State<COREnergyEngageDetailScree
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'COREnergy Engage Log',
+                'COREnergy Engage Copy Log',
                 style: TextStyle(color: Color(0xFF636366), fontFamily: 'monospace', fontSize: 12),
               ),
               const SizedBox(height: 6),

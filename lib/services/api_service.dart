@@ -271,7 +271,7 @@ class ApiService extends ChangeNotifier {
 
         try {
           if (actionType == 'CREATE') {
-            final url = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage');
+            final url = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage%20Copy');
             final syncEngage = COREnergyEngage(
               name: engage.name,
               institutionName: engage.institutionName,
@@ -312,7 +312,7 @@ class ApiService extends ChangeNotifier {
               String? serverDocName;
               try {
                 final searchUrl = Uri.parse(
-                  '$baseUrl/api/resource/COREnergy%20Engage?filters=[["institution_name","=","${engage.institutionName}"]]'
+                  '$baseUrl/api/resource/COREnergy%20Engage%20Copy?filters=[["institution_name","=","${engage.institutionName}"]]'
                 );
                 final searchResponse = await http.get(searchUrl, headers: _headers).timeout(const Duration(seconds: 7));
                 if (searchResponse.statusCode == 200) {
@@ -327,7 +327,7 @@ class ApiService extends ChangeNotifier {
               }
 
               final targetName = serverDocName ?? engage.name;
-              final updateUrl = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage/$targetName');
+              final updateUrl = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage%20Copy/$targetName');
               final updateResponse = await http.put(
                 updateUrl,
                 headers: _headers,
@@ -354,7 +354,7 @@ class ApiService extends ChangeNotifier {
               // It's the Institution ID, let's search if the server has a COREnergy Engage ID for this institution
               try {
                 final searchUrl = Uri.parse(
-                  '$baseUrl/api/resource/COREnergy%20Engage?filters=[["institution_name","=","${engage.institutionName}"]]'
+                  '$baseUrl/api/resource/COREnergy%20Engage%20Copy?filters=[["institution_name","=","${engage.institutionName}"]]'
                 );
                 final searchResponse = await http.get(searchUrl, headers: _headers).timeout(const Duration(seconds: 7));
                 if (searchResponse.statusCode == 200) {
@@ -369,7 +369,7 @@ class ApiService extends ChangeNotifier {
               }
             }
 
-            final url = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage/$targetName');
+            final url = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage%20Copy/$targetName');
             final payloadMap = engage.toJson();
             payloadMap.remove('name');
             final response = await http.put(
@@ -390,7 +390,7 @@ class ApiService extends ChangeNotifier {
                        response.body.contains('DoesNotExistError') || 
                        response.body.contains('not found')) {
               print('COREnergy Engage document does not exist during sync for $targetName. Falling back to POST create...');
-              final createUrl = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage');
+              final createUrl = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage%20Copy');
               final createResponse = await http.post(
                 createUrl,
                 headers: _headers,
@@ -762,7 +762,7 @@ class ApiService extends ChangeNotifier {
 
     if (!_isOffline) {
       final url = Uri.parse(
-        '$baseUrl/api/resource/COREnergy%20Engage?fields=["name","institution_name","region_name","province_name","city_municipality","street_address","sales_rep","creation","modified"]&limit=5000',
+        '$baseUrl/api/resource/COREnergy%20Engage%20Copy?fields=["name","institution_name","region_name","province_name","city_municipality","street_address","sales_rep","creation","modified"]&limit=5000',
       );
       try {
         final response = await http.get(url, headers: _headers).timeout(const Duration(seconds: 7));
@@ -867,7 +867,7 @@ class ApiService extends ChangeNotifier {
       throw Exception('COREnergy Engage detail not found in offline cache.');
     }
 
-    final url = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage/$name');
+    final url = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage%20Copy/$name');
     try {
       final response = await http.get(url, headers: _headers).timeout(const Duration(seconds: 5));
       if (response.statusCode == 200) {
@@ -899,7 +899,7 @@ class ApiService extends ChangeNotifier {
       return _saveCOREnergyEngageOffline(engage, isCreate: true);
     }
 
-    final url = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage');
+    final url = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage%20Copy');
     final payload = engage.toJson();
     payload.remove('name'); // Always remove name for CREATE requests to let server assign/determine naming
     try {
@@ -945,7 +945,7 @@ class ApiService extends ChangeNotifier {
       return _saveCOREnergyEngageOffline(engage, isCreate: false);
     }
 
-    final url = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage/$name');
+    final url = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage%20Copy/$name');
     final payloadMap = engage.toJson();
     payloadMap.remove('name');
     try {

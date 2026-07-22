@@ -4,5 +4,5 @@ enum AppMode {
 }
 
 class AppConfig {
-  static AppMode mode = AppMode.hcp;
+  static AppMode mode = AppMode.corenergy;
 }

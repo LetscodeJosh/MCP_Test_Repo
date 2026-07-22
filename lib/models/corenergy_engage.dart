@@ -105,8 +105,11 @@ class COREnergyEngage {
   final String? region;
   final String? province;
   final String? cityMunicipality;
+  final String? barangayName;
   final String? streetAddress;
   final String? salesRep;
+  final String? leadsSource;
+  final String? leadsStatus;
   final String? creation;
   final String? modified;
 
@@ -122,8 +125,11 @@ class COREnergyEngage {
     this.region,
     this.province,
     this.cityMunicipality,
+    this.barangayName,
     this.streetAddress,
     this.salesRep,
+    this.leadsSource,
+    this.leadsStatus,
     this.creation,
     this.modified,
     this.contacts = const [],
@@ -161,8 +167,11 @@ class COREnergyEngage {
       region: json['region_name'] ?? json['region'],
       province: json['province_name'] ?? json['province'],
       cityMunicipality: json['city_municipality'],
+      barangayName: json['barangay_name'] ?? json['barangay'],
       streetAddress: json['street_address'],
       salesRep: json['sales_rep'],
+      leadsSource: json['leads_source'],
+      leadsStatus: json['leads_status'],
       creation: json['creation'],
       modified: json['modified'],
       contacts: parsedContacts,
@@ -184,8 +193,11 @@ class COREnergyEngage {
       if (province != null) 'province_name': province,
       if (province != null) 'province': province,
       if (cityMunicipality != null) 'city_municipality': cityMunicipality,
+      if (barangayName != null) 'barangay_name': barangayName,
       if (streetAddress != null) 'street_address': streetAddress,
       if (salesRep != null) 'sales_rep': salesRep,
+      if (leadsSource != null) 'leads_source': leadsSource,
+      if (leadsStatus != null) 'leads_status': leadsStatus,
       // Serialize child tables to multiple common naming keys for safety
       'table_ugpp': contacts.map((c) => c.toJson()).toList(),
       'contacts': contacts.map((c) => c.toJson()).toList(),

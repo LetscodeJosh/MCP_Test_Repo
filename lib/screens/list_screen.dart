@@ -1415,17 +1415,26 @@ class _ListScreenState extends State<ListScreen> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           // Resolved Institution Name
-                                          Text(
-                                            (() {
-                                              final match = _allInstitutions.firstWhere(
-                                                (i) => i.name == item.institutionName || i.name == item.name,
-                                                orElse: () => Institution(
-                                                  name: item.name,
-                                                  institutionName: item.hospitalClinic ?? item.institutionName ?? 'Unknown Institution',
-                                                ),
-                                              );
-                                              return match.institutionName;
-                                            })(),
+                                           Text(
+                                             (() {
+                                               final match = _allInstitutions.firstWhere(
+                                                 (i) => i.name == item.institutionName || i.name == item.name,
+                                                 orElse: () => Institution(
+                                                   name: item.name,
+                                                   institutionName: item.hospitalClinic ?? item.institutionName ?? 'Unknown Institution',
+                                                 ),
+                                               );
+                                               final instName = match.institutionName;
+                                               final instCode = match.name;
+                                               if (instName.isNotEmpty && instCode.isNotEmpty && instCode.startsWith('INST-')) {
+                                                 if (instName.contains(instCode)) {
+                                                   return instName;
+                                                 } else {
+                                                   return '$instName - $instCode';
+                                                 }
+                                               }
+                                               return instName.isNotEmpty ? instName : instCode;
+                                             })(),
                                             style: const TextStyle(
                                               color: Color(0xFF1C1C1E),
                                               fontSize: 16,

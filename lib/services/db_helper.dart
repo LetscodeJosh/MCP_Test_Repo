@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/corenergy_engage.dart';
 
@@ -13,11 +14,11 @@ class DbHelper {
   }
 
   static Future<Database> _initDatabase() async {
-    final dbPath = await getDatabasesPath();
-    final pathString = join(dbPath, 'pims_mcp_offline.db');
+    final docsDir = await getApplicationDocumentsDirectory();
+    final pathString = join(docsDir.path, 'pims_mcp_offline.db');
     return await openDatabase(
       pathString,
-      version: 2,
+      version: 3,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE pending_engagements (
@@ -36,6 +37,20 @@ class DbHelper {
             timestamp INTEGER
           )
         ''');
+        await db.execute('''
+          CREATE TABLE cached_engagements (
+            name TEXT PRIMARY KEY,
+            data TEXT,
+            timestamp INTEGER
+          )
+        ''');
+        await db.execute('''
+          CREATE TABLE cached_institutions (
+            name TEXT PRIMARY KEY,
+            data TEXT,
+            timestamp INTEGER
+          )
+        ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -43,6 +58,22 @@ class DbHelper {
             CREATE TABLE pending_institutions (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               temp_id TEXT UNIQUE,
+              data TEXT,
+              timestamp INTEGER
+            )
+          ''');
+        }
+        if (oldVersion < 3) {
+          await db.execute('''
+            CREATE TABLE cached_engagements (
+              name TEXT PRIMARY KEY,
+              data TEXT,
+              timestamp INTEGER
+            )
+          ''');
+          await db.execute('''
+            CREATE TABLE cached_institutions (
+              name TEXT PRIMARY KEY,
               data TEXT,
               timestamp INTEGER
             )
@@ -113,5 +144,44 @@ class DbHelper {
     final db = await database;
     await db.delete('pending_engagements');
     await db.delete('pending_institutions');
+  }
+
+  static Future<void> saveCachedEngagement(COREnergyEngage engage) async {
+    final db = await database;
+    await db.insert(
+      'cached_engagements',
+      {
+        'name': engage.name,
+        'data': jsonEncode(engage.toJson()),
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  static Future<List<COREnergyEngage>> getCachedEngagements() async {
+    final db = await database;
+    final rows = await db.query('cached_engagements', orderBy: 'timestamp DESC');
+    return rows.map((r) => COREnergyEngage.fromJson(jsonDecode(r['data'] as String))).toList();
+  }
+
+  static Future<void> saveCachedInstitution(Map<String, dynamic> instJson) async {
+    final db = await database;
+    final String name = instJson['name'] ?? instJson['institution_name'] ?? DateTime.now().toString();
+    await db.insert(
+      'cached_institutions',
+      {
+        'name': name,
+        'data': jsonEncode(instJson),
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  static Future<List<Map<String, dynamic>>> getCachedInstitutions() async {
+    final db = await database;
+    final rows = await db.query('cached_institutions', orderBy: 'timestamp DESC');
+    return rows.map((r) => jsonDecode(r['data'] as String) as Map<String, dynamic>).toList();
   }
 }

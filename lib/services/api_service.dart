@@ -771,6 +771,9 @@ class ApiService extends ChangeNotifier {
           final List<dynamic> dataList = body['data'] ?? [];
           await _writeToCache('corenergy_engages_cache.json', jsonEncode(dataList));
           baseList = dataList.map((json) => COREnergyEngage.fromJson(json)).toList();
+          for (var eng in baseList) {
+            await DbHelper.saveCachedEngagement(eng);
+          }
           fetchedOnline = true;
         }
       } catch (e) {
@@ -781,14 +784,20 @@ class ApiService extends ChangeNotifier {
     }
 
     if (!fetchedOnline) {
-      final cache = await _readFromCache('corenergy_engages_cache.json');
-      if (cache != null) {
-        try {
-          final List<dynamic> jsonList = jsonDecode(cache);
-          baseList = jsonList.map((json) => COREnergyEngage.fromJson(json)).toList();
-        } catch (_) {}
-      } else {
-        // Mock fallback if no cache exists yet
+      try {
+        baseList = await DbHelper.getCachedEngagements();
+      } catch (_) {}
+        if (baseList.isEmpty) {
+          final cache = await _readFromCache('corenergy_engages_cache.json');
+          if (cache != null) {
+            try {
+              final List<dynamic> jsonList = jsonDecode(cache);
+              baseList = jsonList.map((json) => COREnergyEngage.fromJson(json)).toList();
+            } catch (_) {}
+          }
+        }
+        if (baseList.isEmpty) {
+          // Mock fallback if no cache exists yet
         baseList = [
           COREnergyEngage(
             name: 'INST-04249',

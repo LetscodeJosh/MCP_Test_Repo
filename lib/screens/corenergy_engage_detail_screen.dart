@@ -225,12 +225,32 @@ class _COREnergyEngageDetailScreenState extends State<COREnergyEngageDetailScree
     });
 
     try {
-      final permission = await Geolocator.checkPermission();
+      LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
-        final requested = await Geolocator.requestPermission();
-        if (requested == LocationPermission.denied || requested == LocationPermission.deniedForever) {
-          throw Exception('Location permission denied.');
+        permission = await Geolocator.requestPermission();
+      }
+      
+      if (permission == LocationPermission.deniedForever || permission == LocationPermission.denied) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Location permission is denied in iPad Settings.'),
+              backgroundColor: const Color(0xFFFF3B30),
+              action: SnackBarAction(
+                label: 'Settings',
+                textColor: Colors.white,
+                onPressed: () {
+                  Geolocator.openAppSettings();
+                },
+              ),
+              duration: const Duration(seconds: 6),
+            ),
+          );
         }
+        setState(() {
+          _isLocating = false;
+        });
+        return;
       }
 
       final position = await Geolocator.getCurrentPosition(

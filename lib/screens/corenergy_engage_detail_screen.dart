@@ -588,9 +588,23 @@ class _COREnergyEngageDetailScreenState extends State<COREnergyEngageDetailScree
                         : (() {
                             final match = widget.institutions.firstWhere(
                               (i) => i.name == _selectedCompany,
-                              orElse: () => Institution(name: _selectedCompany!, institutionName: _selectedCompany!),
+                              orElse: () => Institution(
+                                name: _selectedCompany!,
+                                institutionName: _hospitalClinicController.text.trim().isNotEmpty
+                                    ? _hospitalClinicController.text.trim()
+                                    : _selectedCompany!,
+                              ),
                             );
-                            return '${match.name} - ${match.institutionName}';
+                            final instName = (match.institutionName.isNotEmpty && match.institutionName != match.name)
+                                ? match.institutionName
+                                : (_hospitalClinicController.text.trim().isNotEmpty
+                                    ? _hospitalClinicController.text.trim()
+                                    : match.institutionName);
+
+                            if (instName.isNotEmpty && instName != match.name && match.name.isNotEmpty) {
+                              return '$instName - ${match.name}';
+                            }
+                            return instName;
                           })(),
                     style: TextStyle(
                       color: _selectedCompany == null ? const Color(0xFF8E8E93) : const Color(0xFF1C1C1E),

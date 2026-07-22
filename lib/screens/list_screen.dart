@@ -1424,16 +1424,21 @@ class _ListScreenState extends State<ListScreen> {
                                                    institutionName: item.hospitalClinic ?? item.institutionName ?? 'Unknown Institution',
                                                  ),
                                                );
-                                               final instName = match.institutionName;
-                                               final instCode = match.name;
-                                               if (instName.isNotEmpty && instCode.isNotEmpty && instCode.startsWith('INST-')) {
+                                               final instName = (match.institutionName.isNotEmpty && match.institutionName != match.name)
+                                                   ? match.institutionName
+                                                   : (item.hospitalClinic ?? item.institutionName ?? match.name);
+                                               final instCode = (match.name.isNotEmpty && match.name.startsWith('INST-'))
+                                                   ? match.name
+                                                   : (item.name.startsWith('INST-') ? item.name : '');
+
+                                               if (instName.isNotEmpty && instCode.isNotEmpty && instName != instCode) {
                                                  if (instName.contains(instCode)) {
                                                    return instName;
                                                  } else {
                                                    return '$instName - $instCode';
                                                  }
                                                }
-                                               return instName.isNotEmpty ? instName : instCode;
+                                               return instName.isNotEmpty ? instName : match.name;
                                              })(),
                                             style: const TextStyle(
                                               color: Color(0xFF1C1C1E),

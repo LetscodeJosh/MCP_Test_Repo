@@ -28,6 +28,8 @@
 	<string>PIMS HCP needs location access to geotag profiling records.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>PIMS HCP needs camera access to capture geotagged photos.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>PIMS MCP requires Face ID access for quick and secure biometric login.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../app_config.dart';
 import '../services/api_service.dart';
+import '../services/biometric_service.dart';
 import 'doctor_masterlist_screen.dart';
 import 'list_screen.dart';
 
@@ -20,6 +21,28 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   String? _errorMessage;
   bool _obscurePassword = true;
+  bool _isBiometricAvailable = false;
+  bool _hasSavedCredentials = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometrics();
+  }
+
+  Future<void> _checkBiometrics() async {
+    final available = await BiometricService.isBiometricAvailable();
+    final credentials = await BiometricService.getSavedCredentials();
+    if (mounted) {
+      setState(() {
+        _isBiometricAvailable = available;
+        _hasSavedCredentials = credentials != null;
+        if (credentials != null && credentials['username'] != null) {
+          _usernameController.text = credentials['username']!;
+        }
+      });
+    }
+  }
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
@@ -29,11 +52,56 @@ class _LoginScreenState extends State<LoginScreen> {
       _errorMessage = null;
     });
 
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text;
+
     final apiService = Provider.of<ApiService>(context, listen: false);
-    final success = await apiService.login(
-      _usernameController.text.trim(),
-      _passwordController.text,
-    );
+    final success = await apiService.login(username, password);
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (success) {
+        await BiometricService.saveCredentials(username, password);
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => AppConfig.mode == AppMode.corenergy
+                ? const ListScreen()
+                : const DoctorMasterlistScreen(),
+          ),
+        );
+      } else {
+        setState(() {
+          _errorMessage = 'Authentication failed. Please verify your credentials.';
+        });
+      }
+    }
+  }
+
+  Future<void> _handleBiometricLogin() async {
+    final credentials = await BiometricService.getSavedCredentials();
+    if (credentials == null) {
+      setState(() {
+        _errorMessage = 'No saved credentials found. Please log in manually first.';
+      });
+      return;
+    }
+
+    final authenticated = await BiometricService.authenticate();
+    if (!authenticated) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final username = credentials['username']!;
+    final password = credentials['password']!;
+
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    final success = await apiService.login(username, password);
 
     if (mounted) {
       setState(() {
@@ -50,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         setState(() {
-          _errorMessage = 'Authentication failed. Please verify your credentials.';
+          _errorMessage = 'Biometric login failed. Please verify your credentials manually.';
         });
       }
     }
@@ -285,6 +353,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                         ),
+                        if (_isBiometricAvailable && _hasSavedCredentials) ...[
+                          const SizedBox(height: 14),
+                          OutlinedButton.icon(
+                            onPressed: _isLoading ? null : _handleBiometricLogin,
+                            icon: const Icon(Icons.fingerprint, size: 22, color: Color(0xFF0056B3)),
+                            label: const Text(
+                              'Log in with Face ID / Touch ID',
+                              style: TextStyle(
+                                color: Color(0xFF0056B3),
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              side: const BorderSide(color: Color(0xFF0056B3), width: 1.5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),

@@ -333,10 +333,23 @@ class _COREnergyEngageDetailScreenState extends State<COREnergyEngageDetailScree
 
     final apiService = Provider.of<ApiService>(context, listen: false);
 
+    final resolvedInstitutionName = (() {
+      final match = widget.institutions.firstWhere(
+        (i) => i.name == _selectedCompany,
+        orElse: () => Institution(
+          name: _selectedCompany!,
+          institutionName: _hospitalClinicController.text.trim().isNotEmpty
+              ? _hospitalClinicController.text.trim()
+              : _selectedCompany!,
+        ),
+      );
+      return match.institutionName.isNotEmpty ? match.institutionName : _selectedCompany!;
+    })();
+
     final payload = COREnergyEngage(
       name: _selectedCompany!,
-      institutionName: _selectedCompany,
-      hospitalClinic: _hospitalClinicController.text.trim().isEmpty ? null : _hospitalClinicController.text.trim(),
+      institutionName: resolvedInstitutionName,
+      hospitalClinic: _hospitalClinicController.text.trim().isEmpty ? resolvedInstitutionName : _hospitalClinicController.text.trim(),
       region: _regionCode,
       province: _provinceCode,
       cityMunicipality: _cityMunicipalityCode,

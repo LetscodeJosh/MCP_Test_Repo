@@ -614,7 +614,7 @@ class ApiService extends ChangeNotifier {
       return [];
     }
     final url = Uri.parse(
-      '$baseUrl/api/resource/Successful%20COREnergy%20Engagement?fields=["name","unsuccessful_call","company","latitude","longitude","location_accuracy","picture","sales_rep","contact","last_name","position_or_role","email_address","contact_number","date_and_time_of_sales_appointment","decision_maker_or_responsible_person_not_available","reason_for_unsuccessful_call","creation","modified"]&limit=5000',
+      '$baseUrl/api/resource/COREnergy%20Engage%20Copy?fields=["name","institution_name","region","province","city_municipality","street_address","sales_rep","creation","modified"]&limit=5000',
     );
     try {
       final response = await http.get(url, headers: _headers);
@@ -1041,7 +1041,7 @@ class ApiService extends ChangeNotifier {
 
   /// Create a new engagement record
   Future<Engagement> createEngagement(Engagement engagement) async {
-    final url = Uri.parse('$baseUrl/api/resource/Successful%20COREnergy%20Engagement');
+    final url = Uri.parse('$baseUrl/api/resource/COREnergy%20Engage%20Copy');
     try {
       final response = await http.post(
         url,
@@ -1064,7 +1064,7 @@ class ApiService extends ChangeNotifier {
   /// Update an existing engagement record
   Future<Engagement> updateEngagement(String name, Engagement engagement) async {
     final url = Uri.parse(
-      '$baseUrl/api/resource/Successful%20COREnergy%20Engagement/${Uri.encodeComponent(name)}',
+      '$baseUrl/api/resource/COREnergy%20Engage%20Copy/${Uri.encodeComponent(name)}',
     );
     try {
       final response = await http.put(

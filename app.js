@@ -810,7 +810,7 @@ async function erpNextLogin(usr, pwd) {
 
 async function fetchLiveData() {
     try {
-        const fetchEngUrl = `${appState.apiBaseUrl}/api/resource/Successful%20COREnergy%20Engagement?fields=["*"]&limit=100`;
+        const fetchEngUrl = `${appState.apiBaseUrl}/api/resource/COREnergy%20Engage%20Copy?fields=["*"]&limit=100`;
         const fetchInstUrl = `${appState.apiBaseUrl}/api/resource/Institution?fields=["name","institution_name"]&limit=200`;
         
         const [engRes, instRes] = await Promise.all([
@@ -830,7 +830,7 @@ async function fetchLiveData() {
 }
 
 async function createLiveRecord(payload) {
-    const url = `${appState.apiBaseUrl}/api/resource/Successful%20COREnergy%20Engagement`;
+    const url = `${appState.apiBaseUrl}/api/resource/COREnergy%20Engage%20Copy`;
     const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -845,7 +845,7 @@ async function createLiveRecord(payload) {
 }
 
 async function updateLiveRecord(name, payload) {
-    const url = `${appState.apiBaseUrl}/api/resource/Successful%20COREnergy%20Engagement/${encodeURIComponent(name)}`;
+    const url = `${appState.apiBaseUrl}/api/resource/COREnergy%20Engage%20Copy/${encodeURIComponent(name)}`;
     const response = await fetch(url, {
         method: 'PUT',
         headers: {

@@ -32,7 +32,7 @@ class _ListScreenState extends State<ListScreen> {
   String? _selectedCompany;
 
   // Sub tab for COREnergy: 0: Engagements, 1: COREnergy Engage
-  int _corenergySubTab = 0;
+  int _corenergySubTab = 1;
   List<COREnergyEngage> _allEngageLogs = [];
   List<COREnergyEngage> _filteredEngageLogs = [];
 

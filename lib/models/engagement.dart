@@ -43,7 +43,7 @@ class Engagement {
     return Engagement(
       name: json['name'],
       unsuccessfulCall: json['unsuccessful_call'] == 1 || json['unsuccessful_call'] == true,
-      company: json['company'],
+      company: json['company'] ?? json['institution_name'] ?? json['name'],
       latitude: json['latitude'],
       longitude: json['longitude'],
       locationAccuracy: (json['location_accuracy'] as num?)?.toDouble() ?? 0.0,
